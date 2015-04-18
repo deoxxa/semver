@@ -101,10 +101,10 @@ func TestRangeParser(t *testing.T) {
 
 	for _, p := range pairs {
 		r, err := ParseRange(p[0])
-		a.NoError(err)
-		a.NotNil(r)
+		a.NoError(err, p[0])
+		a.NotNil(r, p[0])
 
-		a.Equal(p[1], r.String())
+		a.Equal(p[1], r.String(), p[0]+" : "+p[1])
 	}
 }
 
