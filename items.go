@@ -14,7 +14,6 @@ const (
 	ItemPipe
 	ItemTilde
 	ItemCaret
-	ItemStar
 	ItemEQ
 	ItemLT
 	ItemGT

@@ -400,42 +400,6 @@ func ParseRange(ver string) (Range, error) {
 					s = append(s, c1, c2)
 				}
 			}
-		case ItemStar:
-			if !hasMajor {
-				s = append(s, Comparator{
-					Operator: OperatorGTE,
-				})
-
-				continue
-			}
-
-			c1 := Comparator{
-				Operator: OperatorGTE,
-				Version: Version{
-					Major: major,
-					Minor: minor,
-					Patch: patch,
-				},
-			}
-			c2 := Comparator{
-				Operator: OperatorLT,
-				Version: Version{
-					Major: major,
-					Minor: minor,
-					Patch: patch,
-				},
-			}
-
-			switch {
-			case hasPatch:
-				c2.Version.Patch++
-			case hasMinor:
-				c2.Version.Minor++
-			case hasMajor:
-				c2.Version.Major++
-			}
-
-			s = append(s, c1, c2)
 		case ItemDash:
 			s[len(s)-1].Operator = OperatorGTE
 			operator = OperatorLTE
