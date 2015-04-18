@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParser(t *testing.T) {
+func TestVersionParser(t *testing.T) {
 	a := assert.New(t)
 
 	v, err := ParseVersion("1.2.3-a.b+x.y.z")
@@ -24,4 +24,12 @@ func TestParser(t *testing.T) {
 	a.Equal(v.Build[0], "x")
 	a.Equal(v.Build[1], "y")
 	a.Equal(v.Build[2], "z")
+}
+
+func TestRangeParser(t *testing.T) {
+	a := assert.New(t)
+
+	r, err := ParseRange("* || ~1 || ~1.2 || ~1.2.3")
+	a.NoError(err)
+	a.NotNil(r)
 }
