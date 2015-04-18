@@ -7,6 +7,14 @@ import (
 	"go.bmatsuo.co/go-lexer"
 )
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
 func stateRange(l *lexer.Lexer) lexer.StateFn {
 	if l.AcceptRun(" ") > 0 {
 		l.Ignore()
@@ -196,6 +204,104 @@ func (c Comparator) String() string {
 	return string(c.Operator) + c.Version.String()
 }
 
+func (c Comparator) SatisfiedBy(v Version) bool {
+	switch c.Operator {
+	case OperatorNone:
+		fallthrough
+	case OperatorEQ:
+		if v.Major != c.Version.Major {
+			return false
+		}
+		if v.Minor != c.Version.Minor {
+			return false
+		}
+		if v.Patch != c.Version.Patch {
+			return false
+		}
+		if len(v.Prerelease) != len(c.Version.Prerelease) {
+			return false
+		}
+		if len(v.Build) != len(c.Version.Build) {
+			return false
+		}
+		return true
+	case OperatorGT, OperatorGTE:
+		if v.Major > c.Version.Major {
+			return true
+		} else if v.Major < c.Version.Major {
+			return false
+		}
+
+		if v.Minor > c.Version.Minor {
+			return true
+		} else if v.Minor < c.Version.Minor {
+			return false
+		}
+
+		if v.Patch > c.Version.Patch {
+			return true
+		} else if v.Patch < c.Version.Patch {
+			return false
+		}
+
+		for i, j := 0, min(len(v.Prerelease), len(c.Version.Prerelease)); i < j; i++ {
+			if v.Prerelease[i] > c.Version.Prerelease[i] {
+				return true
+			} else if v.Prerelease[i] < c.Version.Prerelease[i] {
+				return false
+			}
+		}
+
+		for i, j := 0, min(len(v.Build), len(c.Version.Build)); i < j; i++ {
+			if v.Build[i] > c.Version.Build[i] {
+				return true
+			} else if v.Build[i] < c.Version.Build[i] {
+				return false
+			}
+		}
+
+		return c.Operator == OperatorGTE
+	case OperatorLT, OperatorLTE:
+		if v.Major < c.Version.Major {
+			return true
+		} else if v.Major > c.Version.Major {
+			return false
+		}
+
+		if v.Minor < c.Version.Minor {
+			return true
+		} else if v.Minor > c.Version.Minor {
+			return false
+		}
+
+		if v.Patch < c.Version.Patch {
+			return true
+		} else if v.Patch > c.Version.Patch {
+			return false
+		}
+
+		for i, j := 0, min(len(v.Prerelease), len(c.Version.Prerelease)); i < j; i++ {
+			if v.Prerelease[i] < c.Version.Prerelease[i] {
+				return true
+			} else if v.Prerelease[i] > c.Version.Prerelease[i] {
+				return false
+			}
+		}
+
+		for i, j := 0, min(len(v.Build), len(c.Version.Build)); i < j; i++ {
+			if v.Build[i] < c.Version.Build[i] {
+				return true
+			} else if v.Build[i] > c.Version.Build[i] {
+				return false
+			}
+		}
+
+		return c.Operator == OperatorLTE
+	}
+
+	return false
+}
+
 type Set []Comparator
 
 func (s Set) String() string {
@@ -208,6 +314,16 @@ func (s Set) String() string {
 	return strings.Join(l, " ")
 }
 
+func (s Set) SatisfiedBy(v Version) bool {
+	for _, c := range s {
+		if !c.SatisfiedBy(v) {
+			return false
+		}
+	}
+
+	return true
+}
+
 type Range []Set
 
 func (r Range) String() string {
@@ -218,6 +334,16 @@ func (r Range) String() string {
 	}
 
 	return strings.Join(l, " || ")
+}
+
+func (r Range) SatisfiedBy(v Version) bool {
+	for _, s := range r {
+		if s.SatisfiedBy(v) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func ParseRange(ver string) (Range, error) {
