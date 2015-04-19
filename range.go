@@ -133,7 +133,7 @@ func lexPartialVersion(l *lexer.Lexer) lexer.StateFn {
 				return nil
 			}
 
-			if l.AcceptRun("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") == 0 {
+			if l.AcceptRun("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-") == 0 {
 				return l.Errorf("invalid prerelease component")
 			} else {
 				l.Emit(ItemPrerelease)
@@ -157,7 +157,7 @@ func lexPartialVersion(l *lexer.Lexer) lexer.StateFn {
 				return nil
 			}
 
-			if l.AcceptRun("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") == 0 {
+			if l.AcceptRun("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-") == 0 {
 				return l.Errorf("invalid prerelease component")
 			} else {
 				l.Emit(ItemBuild)
