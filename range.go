@@ -79,56 +79,48 @@ func stateRange(l *lexer.Lexer) lexer.StateFn {
 }
 
 func lexPartialVersion(l *lexer.Lexer) lexer.StateFn {
-	if l.Accept("*xX") {
-		l.Emit(ItemComplete)
-
-		return nil
+	if l.Accept("vV") {
+		l.Ignore()
 	}
 
-	if l.AcceptRun("0123456789") == 0 {
-		return l.Errorf("invalid major version")
-	} else {
+	if l.Accept("*xX") {
 		l.Emit(ItemMajor)
+	} else if l.AcceptRun("0123456789") > 0 {
+		l.Emit(ItemMajor)
+	} else {
+		return l.Errorf("invalid major version")
 	}
 
-	if !l.Accept(".") {
+	if l.Accept(".") {
+		l.Emit(ItemPeriod)
+	} else {
 		l.Emit(ItemComplete)
 
 		return nil
-	} else {
-		l.Ignore()
 	}
 
 	if l.Accept("*xX") {
-		l.Emit(ItemComplete)
-
-		return nil
-	}
-
-	if l.AcceptRun("0123456789") == 0 {
-		return l.Errorf("invalid minor version")
-	} else {
 		l.Emit(ItemMinor)
+	} else if l.AcceptRun("0123456789") > 0 {
+		l.Emit(ItemMinor)
+	} else {
+		return l.Errorf("invalid minor version")
 	}
 
-	if !l.Accept(".") {
+	if l.Accept(".") {
+		l.Emit(ItemPeriod)
+	} else {
 		l.Emit(ItemComplete)
 
 		return nil
-	} else {
-		l.Ignore()
 	}
 
 	if l.Accept("*xX") {
-		l.Emit(ItemComplete)
-
-		return nil
-	}
-
-	if l.AcceptRun("0123456789") == 0 {
-		return l.Errorf("invalid patch version")
-	} else {
 		l.Emit(ItemPatch)
+	} else if l.AcceptRun("0123456789") > 0 {
+		l.Emit(ItemPatch)
+	} else {
+		return l.Errorf("invalid patch version")
 	}
 
 	if l.Accept("-") {
@@ -147,10 +139,10 @@ func lexPartialVersion(l *lexer.Lexer) lexer.StateFn {
 				l.Emit(ItemPrerelease)
 			}
 
-			if !l.Accept(".") {
-				break
+			if l.Accept(".") {
+				l.Emit(ItemPeriod)
 			} else {
-				l.Ignore()
+				break
 			}
 		}
 	}
@@ -171,10 +163,10 @@ func lexPartialVersion(l *lexer.Lexer) lexer.StateFn {
 				l.Emit(ItemBuild)
 			}
 
-			if !l.Accept(".") {
-				break
+			if l.Accept(".") {
+				l.Emit(ItemPeriod)
 			} else {
-				l.Ignore()
+				break
 			}
 		}
 	}
@@ -371,6 +363,8 @@ func ParseRange(ver string) (Range, error) {
 		switch t.Type {
 		case ItemWhitespace:
 			continue
+		case ItemPeriod:
+			continue
 		case ItemTilde:
 			operator = OperatorTilde
 			continue
@@ -393,16 +387,22 @@ func ParseRange(ver string) (Range, error) {
 			operator = OperatorGTE
 			continue
 		case ItemMajor:
-			hasMajor = true
-			major, _ = strconv.ParseInt(t.Value, 10, 64)
+			if t.Value != "*" && t.Value != "x" && t.Value != "X" {
+				hasMajor = true
+				major, _ = strconv.ParseInt(t.Value, 10, 64)
+			}
 			continue
 		case ItemMinor:
-			hasMinor = true
-			minor, _ = strconv.ParseInt(t.Value, 10, 64)
+			if t.Value != "*" && t.Value != "x" && t.Value != "X" {
+				hasMinor = true
+				minor, _ = strconv.ParseInt(t.Value, 10, 64)
+			}
 			continue
 		case ItemPatch:
-			hasPatch = true
-			patch, _ = strconv.ParseInt(t.Value, 10, 64)
+			if t.Value != "*" && t.Value != "x" && t.Value != "X" {
+				hasPatch = true
+				patch, _ = strconv.ParseInt(t.Value, 10, 64)
+			}
 			continue
 		case ItemPrerelease:
 			prerelease = append(prerelease, t.Value)

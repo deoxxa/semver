@@ -21,4 +21,5 @@ const (
 	ItemGTE
 	ItemComplete
 	ItemWhitespace
+	ItemPeriod
 )
