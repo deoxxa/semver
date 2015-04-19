@@ -7,14 +7,6 @@ import (
 	"go.bmatsuo.co/go-lexer"
 )
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	} else {
-		return b
-	}
-}
-
 func stateRange(l *lexer.Lexer) lexer.StateFn {
 	if l.AcceptRun(whitespace) > 0 {
 		l.Emit(ItemWhitespace)
