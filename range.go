@@ -15,9 +15,11 @@ func min(a, b int) int {
 	}
 }
 
+const whitespace = " \t"
+
 func stateRange(l *lexer.Lexer) lexer.StateFn {
-	if l.AcceptRun(" ") > 0 {
-		l.Ignore()
+	if l.AcceptRun(whitespace) > 0 {
+		l.Emit(ItemWhitespace)
 	}
 
 	if lexer.IsEOF(l.Peek()) {
@@ -41,23 +43,23 @@ func stateRange(l *lexer.Lexer) lexer.StateFn {
 		l.Emit(ItemLT)
 	}
 
-	if l.AcceptRun(" ") > 0 {
-		l.Ignore()
+	if l.AcceptRun(whitespace) > 0 {
+		l.Emit(ItemWhitespace)
 	}
 
 	if fn := lexPartialVersion(l); fn != nil {
 		return fn
 	}
 
-	if l.AcceptRun(" ") > 0 {
-		l.Ignore()
+	if l.AcceptRun(whitespace) > 0 {
+		l.Emit(ItemWhitespace)
 	}
 
 	if l.AcceptString("-") {
 		l.Emit(ItemDash)
 
-		if l.AcceptRun(" ") > 0 {
-			l.Ignore()
+		if l.AcceptRun(whitespace) > 0 {
+			l.Emit(ItemWhitespace)
 		}
 
 		if fn := lexPartialVersion(l); fn != nil {
@@ -65,8 +67,8 @@ func stateRange(l *lexer.Lexer) lexer.StateFn {
 		}
 	}
 
-	if l.AcceptRun(" ") > 0 {
-		l.Ignore()
+	if l.AcceptRun(whitespace) > 0 {
+		l.Emit(ItemWhitespace)
 	}
 
 	if l.AcceptString("||") {
@@ -367,6 +369,8 @@ func ParseRange(ver string) (Range, error) {
 		}
 
 		switch t.Type {
+		case ItemWhitespace:
+			continue
 		case ItemTilde:
 			operator = OperatorTilde
 			continue

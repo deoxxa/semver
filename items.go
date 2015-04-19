@@ -20,4 +20,5 @@ const (
 	ItemLTE
 	ItemGTE
 	ItemComplete
+	ItemWhitespace
 )
