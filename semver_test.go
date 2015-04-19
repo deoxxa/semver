@@ -1,6 +1,7 @@
 package semver
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -99,12 +100,12 @@ func TestRangeParser(t *testing.T) {
 		{"1", ">=1.0.0 <2.0.0"},
 	}
 
-	for _, p := range pairs {
+	for i, p := range pairs {
 		r, err := ParseRange(p[0])
-		a.NoError(err, p[0])
-		a.NotNil(r, p[0])
+		a.NoError(err, fmt.Sprintf("[%d] %s", i, p[0]))
+		a.NotNil(r, fmt.Sprintf("[%d] %s", i, p[0]))
 
-		a.Equal(p[1], r.String(), p[0]+" : "+p[1])
+		a.Equal(p[1], r.String(), fmt.Sprintf("[%d] %s : %s", i, p[0], p[1]))
 	}
 }
 
@@ -201,15 +202,15 @@ func TestPositiveMatch(t *testing.T) {
 		{"^0.0.1-alpha", "0.0.1-beta"},
 	}
 
-	for _, p := range pairs {
+	for i, p := range pairs {
 		v, err := ParseVersion(p[1])
-		a.NoError(err, p[1])
-		a.NotNil(v, p[1])
+		a.NoError(err, fmt.Sprintf("[%d] %s", i, p[1]))
+		a.NotNil(v, fmt.Sprintf("[%d] %s", i, p[1]))
 
 		r, err := ParseRange(p[0])
-		a.NoError(err, p[0])
-		a.NotNil(r, p[0])
-		a.True(r.SatisfiedBy(v), p[0]+" : "+p[1])
+		a.NoError(err, fmt.Sprintf("[%d] %s", i, p[0]))
+		a.NotNil(r, fmt.Sprintf("[%d] %s", i, p[0]))
+		a.True(r.SatisfiedBy(v), fmt.Sprintf("[%d] %s : %s", i, p[0], p[1]))
 	}
 }
 
@@ -279,14 +280,14 @@ func TestNegativeMatch(t *testing.T) {
 		{"blerg", "1.2.3"},
 	}
 
-	for _, p := range pairs {
+	for i, p := range pairs {
 		v, err := ParseVersion(p[1])
-		a.NoError(err, p[1])
-		a.NotNil(v, p[1])
+		a.NoError(err, fmt.Sprintf("[%d] %s", i, p[1]))
+		a.NotNil(v, fmt.Sprintf("[%d] %s", i, p[1]))
 
 		r, err := ParseRange(p[0])
-		a.NoError(err, p[0])
-		a.NotNil(r, p[0])
-		a.False(r.SatisfiedBy(v), p[0]+" : "+p[1])
+		a.NoError(err, fmt.Sprintf("[%d] %s", i, p[0]))
+		a.NotNil(r, fmt.Sprintf("[%d] %s", i, p[0]))
+		a.False(r.SatisfiedBy(v), fmt.Sprintf("[%d] %s : %s", i, p[0], p[1]))
 	}
 }
