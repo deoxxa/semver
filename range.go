@@ -15,8 +15,6 @@ func min(a, b int) int {
 	}
 }
 
-const whitespace = " \t"
-
 func stateRange(l *lexer.Lexer) lexer.StateFn {
 	if l.AcceptRun(whitespace) > 0 {
 		l.Emit(ItemWhitespace)
@@ -133,7 +131,7 @@ func lexPartialVersion(l *lexer.Lexer) lexer.StateFn {
 				return nil
 			}
 
-			if l.AcceptRun("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-") == 0 {
+			if l.AcceptRun(tagchars) == 0 {
 				return l.Errorf("invalid prerelease component")
 			} else {
 				l.Emit(ItemPrerelease)
@@ -157,7 +155,7 @@ func lexPartialVersion(l *lexer.Lexer) lexer.StateFn {
 				return nil
 			}
 
-			if l.AcceptRun("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-") == 0 {
+			if l.AcceptRun(tagchars) == 0 {
 				return l.Errorf("invalid prerelease component")
 			} else {
 				l.Emit(ItemBuild)
