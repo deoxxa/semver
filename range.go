@@ -458,11 +458,9 @@ func ParseRange(ver string) (Range, error) {
 				c2 := Comparator{
 					Operator: OperatorLT,
 					Version: Version{
-						Major:      major,
-						Minor:      minor,
-						Patch:      patch,
-						Prerelease: prerelease,
-						Build:      build,
+						Major: major,
+						Minor: minor,
+						Patch: patch,
 					},
 				}
 
