@@ -276,8 +276,6 @@ func TestNegativeMatch(t *testing.T) {
 		{"^1.2.3", "2.0.0-alpha"},
 		{"^1.2.3", "1.2.2"},
 		{"^1.2", "1.1.9"},
-		// invalid ranges never satisfied!
-		{"blerg", "1.2.3"},
 	}
 
 	for i, p := range pairs {
