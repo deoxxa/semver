@@ -28,6 +28,18 @@ func (v Version) String() string {
 }
 
 func stateVersion(l *lexer.Lexer) lexer.StateFn {
+	if l.AcceptRun(whitespace) > 0 {
+		l.Ignore()
+	}
+
+	if l.Accept("vV") {
+		l.Ignore()
+	}
+
+	if l.AcceptRun(whitespace) > 0 {
+		l.Ignore()
+	}
+
 	if l.AcceptRun("0123456789") == 0 {
 		return l.Errorf("invalid major version")
 	} else {
