@@ -529,6 +529,7 @@ func ParseRange(ver string) (Range, error) {
 		case ItemDash:
 			s[len(s)-1].Operator = OperatorGTE
 			operator = OperatorLTE
+			continue
 		case ItemPipe:
 			r = append(r, s)
 			s = nil
