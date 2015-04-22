@@ -27,6 +27,147 @@ func (v Version) String() string {
 	return s
 }
 
+func compareTags(a, b string) int {
+	if a == b {
+		return 0
+	}
+
+	d1, err1 := strconv.Atoi(a)
+	d2, err2 := strconv.Atoi(b)
+
+	if err1 == nil && err2 == nil {
+		if d1 > d2 {
+			return 1
+		} else if d1 < d2 {
+			return -1
+		}
+	} else {
+		if a > b {
+			return 1
+		} else if a < b {
+			return -1
+		}
+	}
+
+	return 0
+}
+
+func (v Version) EqualTo(other Version) bool {
+	if v.Major != other.Major || v.Minor != other.Minor || v.Patch != other.Patch || len(v.Prerelease) != len(other.Prerelease) || len(v.Build) != len(other.Build) {
+		return false
+	}
+
+	for i, j := 0, len(v.Prerelease); i < j; i++ {
+		if v.Prerelease[i] != other.Prerelease[i] {
+			return false
+		}
+	}
+
+	for i, j := 0, len(v.Build); i < j; i++ {
+		if v.Build[i] != other.Build[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (v Version) GreaterThan(other Version) bool {
+	if v.Major > other.Major {
+		return true
+	} else if v.Major < other.Major {
+		return false
+	}
+
+	if v.Minor > other.Minor {
+		return true
+	} else if v.Minor < other.Minor {
+		return false
+	}
+
+	if v.Patch > other.Patch {
+		return true
+	} else if v.Patch < other.Patch {
+		return false
+	}
+
+	if len(v.Prerelease) == 0 && len(other.Prerelease) > 0 {
+		return true
+	} else if len(v.Prerelease) > 0 && len(other.Prerelease) == 0 {
+		return false
+	}
+
+	for i, j := 0, min(len(v.Prerelease), len(other.Prerelease)); i < j; i++ {
+		if c := compareTags(v.Prerelease[i], other.Prerelease[i]); c > 0 {
+			return true
+		} else if c < 0 {
+			return false
+		}
+	}
+
+	if len(v.Prerelease) > len(other.Prerelease) {
+		return true
+	}
+
+	for i, j := 0, min(len(v.Build), len(other.Build)); i < j; i++ {
+		if c := compareTags(v.Build[i], other.Build[i]); c > 0 {
+			return true
+		} else if c < 0 {
+			return false
+		}
+	}
+
+	return false
+}
+
+func (v Version) LessThan(other Version) bool {
+	if v.Major < other.Major {
+		return true
+	} else if v.Major > other.Major {
+		return false
+	}
+
+	if v.Minor < other.Minor {
+		return true
+	} else if v.Minor > other.Minor {
+		return false
+	}
+
+	if v.Patch < other.Patch {
+		return true
+	} else if v.Patch > other.Patch {
+		return false
+	}
+
+	if len(v.Prerelease) > 0 && len(other.Prerelease) == 0 {
+		return true
+	} else if len(v.Prerelease) == 0 && len(other.Prerelease) > 0 {
+		return false
+	}
+
+	for i, j := 0, min(len(v.Prerelease), len(other.Prerelease)); i < j; i++ {
+		if c := compareTags(v.Prerelease[i], other.Prerelease[i]); c < 0 {
+			return true
+		} else if c > 0 {
+			return false
+		}
+	}
+
+	if len(v.Prerelease) < len(other.Prerelease) {
+		return true
+	}
+
+	for i, j := 0, min(len(v.Build), len(other.Build)); i < j; i++ {
+		if c := compareTags(v.Build[i], other.Build[i]); c < 0 {
+			return true
+		} else if c > 0 {
+			return false
+		}
+	}
+
+	return false
+}
+
 func stateVersion(l *lexer.Lexer) lexer.StateFn {
 	if l.AcceptRun(whitespace) > 0 {
 		l.Ignore()
