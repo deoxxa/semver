@@ -210,77 +210,17 @@ func (c Comparator) SatisfiedBy(v Version) bool {
 		}
 		return true
 	case OperatorGT, OperatorGTE:
-		if v.Major > c.Version.Major {
-			return true
-		} else if v.Major < c.Version.Major {
+		if v.LessThan(c.Version) {
 			return false
+		} else {
+			return v.GreaterThan(c.Version) || c.Operator == OperatorGTE
 		}
-
-		if v.Minor > c.Version.Minor {
-			return true
-		} else if v.Minor < c.Version.Minor {
-			return false
-		}
-
-		if v.Patch > c.Version.Patch {
-			return true
-		} else if v.Patch < c.Version.Patch {
-			return false
-		}
-
-		for i, j := 0, min(len(v.Prerelease), len(c.Version.Prerelease)); i < j; i++ {
-			if v.Prerelease[i] > c.Version.Prerelease[i] {
-				return true
-			} else if v.Prerelease[i] < c.Version.Prerelease[i] {
-				return false
-			}
-		}
-
-		for i, j := 0, min(len(v.Build), len(c.Version.Build)); i < j; i++ {
-			if v.Build[i] > c.Version.Build[i] {
-				return true
-			} else if v.Build[i] < c.Version.Build[i] {
-				return false
-			}
-		}
-
-		return c.Operator == OperatorGTE
 	case OperatorLT, OperatorLTE:
-		if v.Major < c.Version.Major {
-			return true
-		} else if v.Major > c.Version.Major {
+		if v.GreaterThan(c.Version) {
 			return false
+		} else {
+			return v.LessThan(c.Version) || c.Operator == OperatorLTE
 		}
-
-		if v.Minor < c.Version.Minor {
-			return true
-		} else if v.Minor > c.Version.Minor {
-			return false
-		}
-
-		if v.Patch < c.Version.Patch {
-			return true
-		} else if v.Patch > c.Version.Patch {
-			return false
-		}
-
-		for i, j := 0, min(len(v.Prerelease), len(c.Version.Prerelease)); i < j; i++ {
-			if v.Prerelease[i] < c.Version.Prerelease[i] {
-				return true
-			} else if v.Prerelease[i] > c.Version.Prerelease[i] {
-				return false
-			}
-		}
-
-		for i, j := 0, min(len(v.Build), len(c.Version.Build)); i < j; i++ {
-			if v.Build[i] < c.Version.Build[i] {
-				return true
-			} else if v.Build[i] > c.Version.Build[i] {
-				return false
-			}
-		}
-
-		return c.Operator == OperatorLTE
 	}
 
 	return false
