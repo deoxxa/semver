@@ -270,6 +270,16 @@ func (r Range) SatisfiedBy(v Version) bool {
 	return false
 }
 
+func (r Range) BestMatch(l List) (Version, bool) {
+	for i := len(l) - 1; i > 0; i-- {
+		if r.SatisfiedBy(l[i]) {
+			return l[i], true
+		}
+	}
+
+	return Version{}, false
+}
+
 func ParseRange(ver string) (Range, error) {
 	l := lexer.New(stateRange, ver)
 
