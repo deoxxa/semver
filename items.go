@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	ItemMajor lexer.ItemType = iota
+	ItemWhitespace lexer.ItemType = iota
+	ItemMajor
 	ItemMinor
 	ItemPatch
 	ItemPrerelease
@@ -20,6 +21,5 @@ const (
 	ItemLTE
 	ItemGTE
 	ItemComplete
-	ItemWhitespace
 	ItemPeriod
 )
